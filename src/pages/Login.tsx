@@ -6,6 +6,7 @@ import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
+import Button from "../components/common/Button";
 
 interface FormData {
   email: string;
@@ -86,7 +87,7 @@ export default function Login() {
                 },
               })}
               placeholder="Enter your password"
-              className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-green-900"
+              className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-green-900 "
             />
             <span onClick={toggleShow} className="absolute right-5 cursor-pointer">{show ? <IoEye /> : <IoEyeOff />}</span>
           </div>
@@ -96,24 +97,21 @@ export default function Login() {
           )}
         </div>
 
-        <button
-          disabled={isSubmitting}
-          className="btn w-full text-white bg-green-900 hover:bg-green-800 hover:brightness-110 "
-        >
-          Login
-        </button>
-
+        <Button
+          className=" bg-green-900 text-white hover:bg-green-800 hover:brightness-110"
+          text="Login"
+          type="submit"
+        />
 
         <p className="font-semibold">Or continue with: </p>
 
-        <button
-          type="button"
+        <Button
+          className="bg-white border border-solid border-[#D2D4D7] hover:bg-green-50 font-bold"
           onClick={googleLogin}
-          className="btn w-full bg-transparent border border-solid border-[#D2D4D7] hover:bg-green-50 font-bold"
-        >
-          <FcGoogle className="text-3xl" />
-          Google
-        </button>
+          icon={<FcGoogle className="text-3xl" />}
+          text="Google"
+          type="button"
+        />
 
         <span>
           Don't have an account? <Link className="text-green-900 font-semibold" to="/signup">SignUp here.</Link>

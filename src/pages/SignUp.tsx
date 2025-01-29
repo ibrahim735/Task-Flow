@@ -7,11 +7,13 @@ import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
+import Button from "../components/common/Button";
 
 interface FormData {
   name: string,
   email: string,
   password: string,
+  userImage: string
 }
 
 export default function SignUp() {
@@ -25,7 +27,7 @@ export default function SignUp() {
   }
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    const { email, password, name } = data; // Include name
+    const { email, password, name } = data;
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       const user = auth.currentUser;
@@ -33,7 +35,7 @@ export default function SignUp() {
       if (user) {
         await setDoc(doc(db, 'users', user.uid), {
           email: user.email,
-          name: name, // Use the name from form data
+          name: name,
         });
       }
       console.log('User registered successfully');
@@ -50,7 +52,8 @@ export default function SignUp() {
       if (result.user) {
         await setDoc(doc(db, 'users', result.user.uid), {
           email: result.user.email,
-          name: result.user.displayName // Use the name from form data
+          name: result.user.displayName,
+          userImage: result.user.photoURL
         });
         window.location.href = "/dashboard"
       }
@@ -68,7 +71,7 @@ export default function SignUp() {
 
         <div className="w-full max-w-xs">
           <label htmlFor="name" className="block mb-2 font-semibold text-green-900">
-            Name
+            Full Name
           </label>
           <input
             type="text"
@@ -123,24 +126,22 @@ export default function SignUp() {
           )}
         </div>
 
-        <button
-          disabled={isSubmitting}
-          className="btn w-full text-white bg-green-900 hover:bg-green-800 hover:brightness-110 "
-        >
-          Create account
-        </button>
+        <Button
+          className=" bg-green-900 text-white hover:bg-green-800 hover:brightness-110"
+          text="Create Account"
+          type="submit"
+        />
 
 
         <p className="font-semibold">Or continue with: </p>
 
-        <button
-          type="button"
+        <Button
+          className="bg-white border border-solid border-[#D2D4D7] hover:bg-green-50 font-bold"
           onClick={googleLogin}
-          className="btn w-full bg-transparent border border-solid border-[#D2D4D7] hover:bg-green-50 font-bold"
-        >
-          <FcGoogle className="text-3xl" />
-          Google
-        </button>
+          icon={<FcGoogle className="text-3xl" />}
+          text="Google"
+          type="button"
+        />
 
         <span>
           Already have an account? <Link className="text-green-900 font-semibold" to="/">Login here.</Link>
