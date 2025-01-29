@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from "react";
-import { auth } from "../utils/firebase";
+import { auth, db } from "../utils/firebase";
+import { getDoc, doc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { IoMdNotifications } from "react-icons/io";
 import { FiSearch } from "react-icons/fi";
@@ -19,20 +20,53 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    const fetchUserData = onAuthStateChanged(auth, (user) => {
+    const fetchUserData = onAuthStateChanged(auth, async (user) => {
       if (user) {
         console.log(user);
-        setUserDetails({
-          displayName: user.displayName || "Anonymous",
-          photoURL: user.photoURL || "/default-avatar.png",
-        });
+
+        if (user.providerData.some((provider) => provider.providerId === "google.com")) {
+          setUserDetails({
+            displayName: user.displayName || "Anonymous",
+            photoURL: user.photoURL || "/default-avatar.png",
+          });
+        } else {
+
+          const userDocRef = doc(db, "users", user.uid); 
+          const userDocSnap = await getDoc(userDocRef);
+
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            setUserDetails({
+              displayName: userData.displayName || "Anonymous",
+              photoURL: userData.photoURL || "/default-avatar.png",
+            });
+          } else {
+
+            console.log("User document not found");
+            setUserDetails({
+              displayName: "Anonymous",
+              photoURL: "/default-avatar.png",
+            });
+          }
+        }
       } else {
         console.log("no user signed in");
         setUserDetails(null);
       }
     });
+    
     return () => fetchUserData();
   }, []);
+
+  async function handleLogout() {
+    try {
+      await auth.signOut();
+      window.location.href = "./"
+      console.log('user logged out successfully')
+    } catch (error: any) {
+      console.error('error logging out', error.message)
+    }
+  }
 
   return (
     <div>
@@ -66,7 +100,7 @@ export default function Dashboard() {
                   Profile
                 </li>
 
-                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                <li onClick={handleLogout} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                   Logout
                 </li>
               </ul>
